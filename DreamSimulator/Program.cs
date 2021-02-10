@@ -5,22 +5,28 @@ namespace DreamSimulator
 {
     class Program
     {
+        static int ThreadCount;
         static void Main(string[] args)
         {
+            DateTime startTime = DateTime.Now;
             Max results = new Max();
-            Console.WriteLine("How Many 10 Million Iterations do you want");
+            Console.WriteLine("How Many 100 Million Iterations do you want");
             string Iterations = Console.ReadLine();
             int it = Convert.ToInt32(Iterations);
             Thread t = new Thread(() => Compute(it, results));
             t.Start();
             t.Join();
-            while(t.IsAlive)
+            while(t.IsAlive && ThreadCount != 0)
             {
             }
             Console.WriteLine("Execution Finished");
+            TimeSpan ts = DateTime.Now - startTime;
+            Console.WriteLine($"Time Taken : {ts.TotalSeconds}");
+            Console.ReadLine();
         }
         public static void Compute(int it, Max results)
         {
+            ThreadCount++;
             for (int i = 0; i < it; i++)
             {
                 Thread t = new Thread(() => Million(ref results));
@@ -30,9 +36,11 @@ namespace DreamSimulator
                     t.Join();
                 }
             }
+            ThreadCount--;
         }
         public static void Million(ref Max result)
         {
+            ThreadCount++;
             bool[] Enderpearls = new bool[262];
             bool[] Blazerods = new bool[305];
             int E = 0;
@@ -40,10 +48,10 @@ namespace DreamSimulator
             int Emax = 0;
             int Bmax = 0;
             Random Rand = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-            for (int i = 0; i < 10000000; i++)
+            for (int i = 0; i < 100000000; i++)
             {
                 int Randomnum = Rand.Next();
-                if (Randomnum % 1000 < 47 && Enderpearls[i % 262] == false)
+                if (Randomnum % 423 < 20 && Enderpearls[i % 262] == false)
                 {
                     Enderpearls[i % 262] = true;
                     E++;
@@ -52,7 +60,7 @@ namespace DreamSimulator
                         Emax = E;
                     }
                 }
-                if (Randomnum % 1000 >= 47 && Enderpearls[i % 262] == true)
+                if (Randomnum % 423 >= 20 && Enderpearls[i % 262] == true)
                 {
                     Enderpearls[i % 262] = false;
                     E--;
@@ -80,6 +88,7 @@ namespace DreamSimulator
             {
                 Console.WriteLine(result.getE() + " Out of 262 EnderPearl Trades");
             }
+            ThreadCount--;
         }
     }
     public class Max
